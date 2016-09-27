@@ -1,0 +1,36 @@
+<h1>
+  <%= @place.city %>
+</h1>
+
+<div class="col-xs-12 col-md-4">
+  <h4>Hotels</h4>
+  <% @hotels_details.each do |hotel| %>
+    <% h = hotel["result"] %>
+    <div>
+      <h5><%= link_to h["name"], h["url"] %></h5>
+      <p><%= h["formatted_address"] %></p>
+    </div>
+  <% end %>
+</div>
+
+<div class="col-xs-12 col-md-4">
+  <h4>Attractions</h4>
+  <% @attractions_details.each do |attraction| %>
+    <% a = attraction["result"] %>
+    <div>
+      <h5><%= link_to a["name"], a["url"] %></h5>
+      <p><%= a["formatted_address"] %></p>
+    </div>
+  <% end %>
+</div>
+
+<div class="col-xs-12 col-md-4">
+  <h4>Restaurants</h4>
+  <% @restaurants_details.each do |restaurant| %>
+    <% r = restaurant["result"] %>
+    <div>
+      <h5><%= link_to r["name"], r["url"] %></h5>
+      <p><%= r["formatted_address"] %></p>
+    </div>
+  <% end %>
+</div>
