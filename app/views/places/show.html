@@ -2,35 +2,63 @@
   <%= @place.city %>
 </h1>
 
-<div class="col-xs-12 col-md-4">
-  <h4>Hotels</h4>
+<div class="col-xs-12 col-sm-4">
+  <h3>Hotels</h3>
   <% @hotels_details.each do |hotel| %>
     <% h = hotel["result"] %>
     <div>
-      <h5><%= link_to h["name"], h["url"] %></h5>
+      <p>
+        <b><%= h["name"] %></b>&nbsp;
+        <% unless h["price_level"].nil? %>
+          <% h["price_level"].to_i.times do |i| %>$<% end %>
+        <% end %>
+        <button><%= link_to '+',  
+      </p>
       <p><%= h["formatted_address"] %></p>
+      <% unless h["website"].nil? %>
+        <button><%= link_to "View website", h["website"] %></button>
+      <% end %>
+      <button><%= link_to "View on Google Maps", h["url"] %></button>
     </div>
   <% end %>
 </div>
 
-<div class="col-xs-12 col-md-4">
-  <h4>Attractions</h4>
+<div class="col-xs-12 col-sm-4">
+  <h3>Attractions</h3>
   <% @attractions_details.each do |attraction| %>
     <% a = attraction["result"] %>
     <div>
-      <h5><%= link_to a["name"], a["url"] %></h5>
+      <p>
+        <b><%= a["name"] %></b>&nbsp;
+        <% unless a["price_level"].nil? %>
+          <% a["price_level"].to_i.times do |i| %>$<% end %>
+        <% end %>
+      </p>
       <p><%= a["formatted_address"] %></p>
+      <% unless a["website"].nil? %>
+        <button><%= link_to "View website", a["website"] %></button>
+      <% end %>
+      <button><%= link_to "View on Google Maps", a["url"] %></button>
     </div>
   <% end %>
 </div>
 
-<div class="col-xs-12 col-md-4">
-  <h4>Restaurants</h4>
+<div class="col-xs-12 col-sm-4">
+  <h3>Restaurants</h3>
   <% @restaurants_details.each do |restaurant| %>
     <% r = restaurant["result"] %>
     <div>
-      <h5><%= link_to r["name"], r["url"] %></h5>
+      <p>
+        <b><%= r["name"] %></b>&nbsp;
+        <% unless r["price_level"].nil? %>
+          <% r["price_level"].to_i.times do |i| %>$<% end %>
+        <% end %>
+      </p>
       <p><%= r["formatted_address"] %></p>
+      <% unless r["website"].nil? %>
+        <button><%= link_to "View website", r["website"] %></button>
+      <% end %>
+      <button><%= link_to "View on Google Maps", r["url"] %></button>
     </div>
   <% end %>
 </div>
