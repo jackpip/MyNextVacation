@@ -1,18 +1,80 @@
+<script>
+$(function() {
+  var url = window.location.pathname;
+  var id = url.substring(url.lastIndexOf('/') + 1);
+  $('.itinerary-button').on("click", function() {
+    console.log("hello");
+    $(this).html("hello");
+    $.post('/plans', {
+      _method: "POST",
+      place_id: id
+    })
+    .fail(function(response) {
+      $('.itinerary-container').append("<div>Bad</div>");
+    })
+    .done(function(msg) {
+      $('.itinerary-container').append("<div>good</div>");
+      $('.itinerary-container').append(msg);
+    });
+  });
+  $('.add').on("click", function() {
+    gp = $(this).parent().parent();
+    $.post('/sights', {
+      _method: "POST",
+      name: gp.data("name"),
+      address: gp.data("address"),
+      website: gp.data("website"),
+      url: gp.data("url"),
+      plan_id: $('.itinerary').data("id"),
+      place_id: id
+    })
+    .done(function(msg) {
+      $('.itinerary-container').append(gp.data("name"));
+      //$.post('/plans/' , {
+
+      //})
+      //.done(function(msg) {
+      //  $('.itinerary-container').append(gp.dataset.name);
+      //});
+    });
+  });
+});
+</script>
+
 <h1>
   <%= @place.city %>
 </h1>
+
+<div class="itinerary-container" >
+  <% if user_signed_in? %>
+    <% plan = current_user.plans.where(place: @place).first %>
+    <% unless plan.nil? %>
+      <p class="itinerary" data-id="<%= plan.id %>" >Your Itinerary</p>
+      <% plan.sights.each do |sight| %>
+        <%= sight.name %>
+        <%= sight.address %>
+        <%= link_to "Website", sight.website %>
+        <%= link_to "Google Maps", sight.url %>
+      <% end %>
+    <% else %>
+      <div class="itinerary-button">
+        Create itinerary
+      </div>
+    <% end %>
+  <% end %>
+</div>
 
 <div class="col-xs-12 col-sm-4">
   <h3>Hotels</h3>
   <% @hotels_details.each do |hotel| %>
     <% h = hotel["result"] %>
-    <div>
+    <div data-name="<%= h["name"] %>" data-address="<%= h["formatted_address"] %>" data-website="<%= h["website"] %>" data-url="<%= h["url"] %>" >
       <p>
+        <span class="add">+</span>
         <b><%= h["name"] %></b>&nbsp;
         <% unless h["price_level"].nil? %>
           <% h["price_level"].to_i.times do |i| %>$<% end %>
         <% end %>
-        <button><%= link_to '+',  
       </p>
       <p><%= h["formatted_address"] %></p>
       <% unless h["website"].nil? %>
