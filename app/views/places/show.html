@@ -1,36 +1,153 @@
+<script>
+$(function() {
+  var url = window.location.pathname;
+  var id = url.substring(url.lastIndexOf('/') + 1);
+  $('.itinerary-button').on("click", function() {
+    console.log("hello");
+    $(this).html("hello");
+    $.post('/plans', {
+      _method: "POST",
+      place_id: id
+    }, "json")
+    .always(function(response) {
+      var j = JSON.parse(response.responseText);
+      $('.itinerary').data("id") = j.id
+    });
+  });
+  $('.add').on("click", function() {
+    gp = $(this).parent().parent();
+    $.post('/sights', {
+      _method: "POST",
+      name: gp.data("name"),
+      address: gp.data("address"),
+      website: gp.data("website"),
+      url: gp.data("url"),
+      plan_id: $('.itinerary').data("id"),
+      place_id: id
+    })
+    .always(function(response) {
+      var s = JSON.parse(response.responseText);
+      gp.data("id", s.id);
+      $('.itinerary-container').append("<div data-id=" + s.id + "><p><span class='remove'>-</span> <b>" + gp.data("name") + "</b><p>" + gp.data("address") + "</p><button src=" + gp.data("website") + ">View Website</button><button src=" + gp.data("url") + ">View on Google Maps</button></p></div>");
+      console.log(1);
+    });
+  });
+  $(document).on("click", ".remove", function() {
+    t = $(this);
+    var n = $(this).next().html();
+    $.ajax({
+      url: '/sights/' + $(this).parent().parent().attr('data-id'),
+      type: 'DELETE',
+      data: {
+        name: n,
+        place_id: id,
+        plan_id: $('.itinerary').data("id")
+      },
+    })
+    .done(function(msg) {
+      t.parent().parent().remove();
+    });
+
+    /*$.post('/sights', {
+      _method: "DELETE",
+      name: n,
+      place_id: id,
+      plan_id: $('.itinerary').data("id")
+    })
+    .done(function(msg) {
+      t.parent().remove();
+    });*/
+  });
+});
+</script>
+
 <h1>
   <%= @place.city %>
 </h1>
 
-<div class="col-xs-12 col-md-4">
-  <h4>Hotels</h4>
+<div class="itinerary-container" >
+  <% if user_signed_in? %>
+    <% plan = current_user.plans.where(place: @place).first %>
+    <% unless plan.nil? %>
+      <p class="itinerary" data-id="<%= plan.id %>" >Your Itinerary</p>
+      <% plan.sights.each do |sight| %>
+        <div data-id="<%= sight.id %>">
+          <p>
+            <span class='remove'>-</span>
+            <b><%= sight.name %></b>
+            <p><%= sight.address %></p>
+            <button><%= link_to "View Website", sight.website %></button>
+            <button><%= link_to "View on Google Maps", sight.url %></button>
+          </p>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="itinerary-button">
+        Create itinerary
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="col-xs-12 col-sm-4">
+  <h3>Hotels</h3>
   <% @hotels_details.each do |hotel| %>
     <% h = hotel["result"] %>
-    <div>
-      <h5><%= link_to h["name"], h["url"] %></h5>
+    <div data-name="<%= h['name'] %>" data-address="<%= h['formatted_address'] %>" data-website="<%= h['website'] %>" data-url="<%= h['url'] %>" >
+      <p>
+        <span class="add">+</span>
+        <b><%= h["name"] %></b>&nbsp;
+        <% unless h["price_level"].nil? %>
+          <% h["price_level"].to_i.times do |i| %>$<% end %>
+        <% end %>
+      </p>
       <p><%= h["formatted_address"] %></p>
+      <% unless h["website"].nil? %>
+        <button><%= link_to "View website", h["website"] %></button>
+      <% end %>
+      <button><%= link_to "View on Google Maps", h["url"] %></button>
     </div>
   <% end %>
 </div>
 
-<div class="col-xs-12 col-md-4">
-  <h4>Attractions</h4>
+<div class="col-xs-12 col-sm-4">
+  <h3>Attractions</h3>
   <% @attractions_details.each do |attraction| %>
     <% a = attraction["result"] %>
-    <div>
-      <h5><%= link_to a["name"], a["url"] %></h5>
+    <div data-name="<%= a['name'] %>" data-address="<%= a['formatted_address'] %>" data-website="<%= a['website'] %>" data-url="<%= a['url'] %>" >
+      <p>
+        <span class="add">+</span>
+        <b><%= a["name"] %></b>&nbsp;
+        <% unless a["price_level"].nil? %>
+          <% a["price_level"].to_i.times do |i| %>$<% end %>
+        <% end %>
+      </p>
       <p><%= a["formatted_address"] %></p>
+      <% unless a["website"].nil? %>
+        <button><%= link_to "View website", a["website"] %></button>
+      <% end %>
+      <button><%= link_to "View on Google Maps", a["url"] %></button>
     </div>
   <% end %>
 </div>
 
-<div class="col-xs-12 col-md-4">
-  <h4>Restaurants</h4>
+<div class="col-xs-12 col-sm-4">
+  <h3>Restaurants</h3>
   <% @restaurants_details.each do |restaurant| %>
     <% r = restaurant["result"] %>
-    <div>
-      <h5><%= link_to r["name"], r["url"] %></h5>
+    <div data-name="<%= r['name'] %>" data-address="<%= r['formatted_address'] %>" data-website="<%= r['website'] %>" data-url="<%= r['url'] %>" >
+      <p>
+        <span class="add">+</span>
+        <b><%= r["name"] %></b>&nbsp;
+        <% unless r["price_level"].nil? %>
+          <% r["price_level"].to_i.times do |i| %>$<% end %>
+        <% end %>
+      </p>
       <p><%= r["formatted_address"] %></p>
+      <% unless r["website"].nil? %>
+        <button><%= link_to "View website", r["website"] %></button>
+      <% end %>
+      <button><%= link_to "View on Google Maps", r["url"] %></button>
     </div>
   <% end %>
 </div>
