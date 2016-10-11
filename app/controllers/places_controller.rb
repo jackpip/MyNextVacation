@@ -15,12 +15,12 @@ class PlacesController < ApplicationController
 
   def details(list)
     d = []
-    i = 0
+    #i = 0
     list["results"].each do |r|
-      return d if i >= 3
+      #return d if i >= 3
       id = r["place_id"]
       d.push(HTTParty.get(@base_uri + "details/json?placeid=" + id + "&key=" + ENV["PLACES_SECRET_KEY"]))
-      i += 1
+      #i += 1
     end
     d
   end
