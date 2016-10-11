@@ -7,7 +7,13 @@ class PlansController < ApplicationController
     puts params[:id]
     @place = Place.find(params[:place_id])
     @plan = current_user.plans.create(place: @place )
-    head :ok, content_type: "text/html"
+    id_plan = @plan.id
+    respond_to do |format|
+      format.js { render json: @plan, status: :ok }
+    end
+    #redirect_to place_path(@place)
+    #render :json => @plan
+    #head :ok, content_type: "text/html"
   end
 
 end

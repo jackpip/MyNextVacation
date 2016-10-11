@@ -8,13 +8,10 @@ $(function() {
     $.post('/plans', {
       _method: "POST",
       place_id: id
-    })
-    .fail(function(response) {
-      $('.itinerary-container').append("<div>Bad</div>");
-    })
-    .done(function(msg) {
-      $('.itinerary-container').append("<div>good</div>");
-      $('.itinerary-container').append(msg);
+    }, "json")
+    .always(function(response) {
+      var j = JSON.parse(response.responseText);
+      $('.itinerary').data("id") = j.id
     });
   });
   $('.add').on("click", function() {
@@ -28,15 +25,38 @@ $(function() {
       plan_id: $('.itinerary').data("id"),
       place_id: id
     })
-    .done(function(msg) {
-      $('.itinerary-container').append(gp.data("name"));
-      //$.post('/plans/' , {
-
-      //})
-      //.done(function(msg) {
-      //  $('.itinerary-container').append(gp.dataset.name);
-      //});
+    .always(function(response) {
+      var s = JSON.parse(response.responseText);
+      gp.data("id", s.id);
+      $('.itinerary-container').append("<div data-id=" + s.id + "><p><span class='remove'>-</span> <b>" + gp.data("name") + "</b><p>" + gp.data("address") + "</p><button src=" + gp.data("website") + ">View Website</button><button src=" + gp.data("url") + ">View on Google Maps</button></p></div>");
+      console.log(1);
     });
+  });
+  $(document).on("click", ".remove", function() {
+    t = $(this);
+    var n = $(this).next().html();
+    $.ajax({
+      url: '/sights/' + $(this).parent().parent().attr('data-id'),
+      type: 'DELETE',
+      data: {
+        name: n,
+        place_id: id,
+        plan_id: $('.itinerary').data("id")
+      },
+    })
+    .done(function(msg) {
+      t.parent().parent().remove();
+    });
+
+    /*$.post('/sights', {
+      _method: "DELETE",
+      name: n,
+      place_id: id,
+      plan_id: $('.itinerary').data("id")
+    })
+    .done(function(msg) {
+      t.parent().remove();
+    });*/
   });
 });
 </script>
@@ -51,10 +71,15 @@ $(function() {
     <% unless plan.nil? %>
       <p class="itinerary" data-id="<%= plan.id %>" >Your Itinerary</p>
       <% plan.sights.each do |sight| %>
-        <%= sight.name %>
-        <%= sight.address %>
-        <%= link_to "Website", sight.website %>
-        <%= link_to "Google Maps", sight.url %>
+        <div data-id="<%= sight.id %>">
+          <p>
+            <span class='remove'>-</span>
+            <b><%= sight.name %></b>
+            <p><%= sight.address %></p>
+            <button><%= link_to "View Website", sight.website %></button>
+            <button><%= link_to "View on Google Maps", sight.url %></button>
+          </p>
+        </div>
       <% end %>
     <% else %>
       <div class="itinerary-button">
@@ -68,7 +93,7 @@ $(function() {
   <h3>Hotels</h3>
   <% @hotels_details.each do |hotel| %>
     <% h = hotel["result"] %>
-    <div data-name="<%= h["name"] %>" data-address="<%= h["formatted_address"] %>" data-website="<%= h["website"] %>" data-url="<%= h["url"] %>" >
+    <div data-name="<%= h['name'] %>" data-address="<%= h['formatted_address'] %>" data-website="<%= h['website'] %>" data-url="<%= h['url'] %>" >
       <p>
         <span class="add">+</span>
         <b><%= h["name"] %></b>&nbsp;
@@ -89,8 +114,9 @@ $(function() {
   <h3>Attractions</h3>
   <% @attractions_details.each do |attraction| %>
     <% a = attraction["result"] %>
-    <div>
+    <div data-name="<%= a['name'] %>" data-address="<%= a['formatted_address'] %>" data-website="<%= a['website'] %>" data-url="<%= a['url'] %>" >
       <p>
+        <span class="add">+</span>
         <b><%= a["name"] %></b>&nbsp;
         <% unless a["price_level"].nil? %>
           <% a["price_level"].to_i.times do |i| %>$<% end %>
@@ -109,8 +135,9 @@ $(function() {
   <h3>Restaurants</h3>
   <% @restaurants_details.each do |restaurant| %>
     <% r = restaurant["result"] %>
-    <div>
+    <div data-name="<%= r['name'] %>" data-address="<%= r['formatted_address'] %>" data-website="<%= r['website'] %>" data-url="<%= r['url'] %>" >
       <p>
+        <span class="add">+</span>
         <b><%= r["name"] %></b>&nbsp;
         <% unless r["price_level"].nil? %>
           <% r["price_level"].to_i.times do |i| %>$<% end %>
