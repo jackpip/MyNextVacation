@@ -3,15 +3,15 @@ $(function() {
   var url = window.location.pathname;
   var id = url.substring(url.lastIndexOf('/') + 1);
   $('.itinerary-button').on("click", function() {
-    console.log("hello");
-    $(this).html("hello");
+    $(this).remove();
+    $('.itinerary-container').append("<p class='itinerary' >Your Itinerary</p>");
     $.post('/plans', {
       _method: "POST",
       place_id: id
     }, "json")
     .always(function(response) {
       var j = JSON.parse(response.responseText);
-      $('.itinerary').data("id") = j.id
+      $('.itinerary').data("id", j.id)
     });
   });
   $('.add').on("click", function() {
@@ -29,7 +29,6 @@ $(function() {
       var s = JSON.parse(response.responseText);
       gp.data("id", s.id);
       $('.itinerary-container').append("<div data-id=" + s.id + "><p><span class='remove'>-</span> <b>" + gp.data("name") + "</b><p>" + gp.data("address") + "</p><button src=" + gp.data("website") + ">View Website</button><button src=" + gp.data("url") + ">View on Google Maps</button></p></div>");
-      console.log(1);
     });
   });
   $(document).on("click", ".remove", function() {
