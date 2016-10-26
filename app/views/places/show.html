@@ -2,7 +2,7 @@
 $(function() {
   var url = window.location.pathname;
   var id = url.substring(url.lastIndexOf('/') + 1);
-  $('.itinerary-button').on("click", function() {
+  $('.itinerary-span').on("click", function() {
     $(this).remove();
     $('.itinerary-container').append("<p class='itinerary' >Your Itinerary</p>");
     $.post('/plans', {
@@ -28,7 +28,7 @@ $(function() {
     .always(function(response) {
       var s = JSON.parse(response.responseText);
       gp.data("id", s.id);
-      $('.itinerary-container').append("<div data-id=" + s.id + "><p><span class='remove'>-</span> <b>" + gp.data("name") + "</b><p>" + gp.data("address") + "</p><button src=" + gp.data("website") + ">View Website</button><button src=" + gp.data("url") + ">View on Google Maps</button></p></div>");
+      $('.itinerary-container').append("<div class='booyah-box' data-id=" + s.id + "><p><span class='remove'>-</span> <b>" + gp.data("name") + "</b><p>" + gp.data("address") + "</p><span class='btn btn-primary' src='" + gp.data("website") + "'>View Website</span><span class='btn btn-primary' src='" + gp.data("url") + "'>View on Google Maps</span></p></div>");
     });
   });
   $(document).on("click", ".remove", function() {
@@ -64,35 +64,35 @@ $(function() {
   <%= @place.city %>
 </h1>
 
-<div class="itinerary-container" >
+<div class="itinerary-container booyah-box" >
   <% if user_signed_in? %>
     <% plan = current_user.plans.where(place: @place).first %>
     <% unless plan.nil? %>
       <p class="itinerary" data-id="<%= plan.id %>" >Your Itinerary</p>
       <% plan.sights.each do |sight| %>
-        <div data-id="<%= sight.id %>">
+        <div class="booyah-box" data-id="<%= sight.id %>">
           <p>
             <span class='remove'>-</span>
             <b><%= sight.name %></b>
             <p><%= sight.address %></p>
-            <button><%= link_to "View Website", sight.website %></button>
-            <button><%= link_to "View on Google Maps", sight.url %></button>
+            <%= link_to "View Website", sight.website, :class => "btn btn-primary" %>
+            <%= link_to "View on Google Maps", sight.url, :class => "btn btn-primary" %>
           </p>
         </div>
       <% end %>
     <% else %>
-      <div class="itinerary-button">
+      <div class="itinerary-span btn btn-primary">
         Create itinerary
       </div>
     <% end %>
   <% end %>
 </div>
 
-<div class="col-xs-12 col-sm-4">
+<div class="col-xs-12 col-sm-4 booyah-box">
   <h3>Hotels</h3>
   <% @hotels_details.each do |hotel| %>
     <% h = hotel["result"] %>
-    <div data-name="<%= h['name'] %>" data-address="<%= h['formatted_address'] %>" data-website="<%= h['website'] %>" data-url="<%= h['url'] %>" >
+    <div class="booyah-box" data-name="<%= h['name'] %>" data-address="<%= h['formatted_address'] %>" data-website="<%= h['website'] %>" data-url="<%= h['url'] %>" >
       <p>
         <span class="add">+</span>
         <b><%= h["name"] %></b>&nbsp;
@@ -102,18 +102,18 @@ $(function() {
       </p>
       <p><%= h["formatted_address"] %></p>
       <% unless h["website"].nil? %>
-        <button><%= link_to "View website", h["website"] %></button>
+        <%= link_to "View website", h["website"], :class => "btn btn-primary" %>
       <% end %>
-      <button><%= link_to "View on Google Maps", h["url"] %></button>
+      <%= link_to "View on Google Maps", h["url"], :class => "btn btn-primary" %>
     </div>
   <% end %>
 </div>
 
-<div class="col-xs-12 col-sm-4">
+<div class="col-xs-12 col-sm-4 booyah-box">
   <h3>Attractions</h3>
   <% @attractions_details.each do |attraction| %>
     <% a = attraction["result"] %>
-    <div data-name="<%= a['name'] %>" data-address="<%= a['formatted_address'] %>" data-website="<%= a['website'] %>" data-url="<%= a['url'] %>" >
+    <div class="booyah-box" data-name="<%= a['name'] %>" data-address="<%= a['formatted_address'] %>" data-website="<%= a['website'] %>" data-url="<%= a['url'] %>" >
       <p>
         <span class="add">+</span>
         <b><%= a["name"] %></b>&nbsp;
@@ -123,18 +123,18 @@ $(function() {
       </p>
       <p><%= a["formatted_address"] %></p>
       <% unless a["website"].nil? %>
-        <button><%= link_to "View website", a["website"] %></button>
+        <%= link_to "View website", a["website"], :class => "btn btn-primary" %>
       <% end %>
-      <button><%= link_to "View on Google Maps", a["url"] %></button>
+      <%= link_to "View on Google Maps", a["url"], :class => "btn btn-primary" %>
     </div>
   <% end %>
 </div>
 
-<div class="col-xs-12 col-sm-4">
+<div class="col-xs-12 col-sm-4 booyah-box">
   <h3>Restaurants</h3>
   <% @restaurants_details.each do |restaurant| %>
     <% r = restaurant["result"] %>
-    <div data-name="<%= r['name'] %>" data-address="<%= r['formatted_address'] %>" data-website="<%= r['website'] %>" data-url="<%= r['url'] %>" >
+    <div class="booyah-box" data-name="<%= r['name'] %>" data-address="<%= r['formatted_address'] %>" data-website="<%= r['website'] %>" data-url="<%= r['url'] %>" >
       <p>
         <span class="add">+</span>
         <b><%= r["name"] %></b>&nbsp;
@@ -144,9 +144,9 @@ $(function() {
       </p>
       <p><%= r["formatted_address"] %></p>
       <% unless r["website"].nil? %>
-        <button><%= link_to "View website", r["website"] %></button>
+        <%= link_to "View website", r["website"], :class => "btn btn-primary" %>
       <% end %>
-      <button><%= link_to "View on Google Maps", r["url"] %></button>
+      <%= link_to "View on Google Maps", r["url"], :class => "btn btn-primary" %>
     </div>
   <% end %>
 </div>
